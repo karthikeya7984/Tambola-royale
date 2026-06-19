@@ -6,9 +6,8 @@ Real-Time Multiplayer Housie (Tambola/Bingo) Game built with React, Node.js, Soc
 
 | API | Purpose | Where to get |
 |-----|---------|-------------|
-| **Google OAuth 2.0** | User authentication | [Google Cloud Console](https://console.cloud.google.com) → APIs & Services → Credentials |
 | **MongoDB Atlas** | Database | [MongoDB Atlas](https://www.mongodb.com/atlas) → Free cluster → Connection string |
-| **Firebase Cloud Messaging** *(optional)* | Push notifications | [Firebase Console](https://console.firebase.google.com) |
+
 
 ## Quick Start
 
@@ -125,7 +124,7 @@ Access at `http://localhost:3000`
 
 ## Features
 
-- 🔐 Google OAuth authentication
+
 - 🎮 Host/Join game rooms with unique codes
 - 🎱 Animated number jar with physics balls
 - 🎟️ Auto-generated valid Tambola tickets
