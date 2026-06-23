@@ -47,8 +47,8 @@ function initSocket(socketIO) {
           winners: winners.map(w => ({
             _id: w._id,
             userId: w.userId,
-            userName: (w.userId as any)?.name || 'Unknown',
-            avatar: (w.userId as any)?.avatar || '',
+            userName: w.userId?.name || 'Unknown',
+            avatar: w.userId?.avatar || '',
             prizeName: w.prizeName,
             prizeId: w.prizeId,
             claimTime: w.claimTime,
