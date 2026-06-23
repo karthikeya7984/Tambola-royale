@@ -22,9 +22,12 @@ export function useSocket() {
 
     socket = io(SOCKET_URL, { auth: { token }, transports: ['websocket'] });
 
-    socket.on('roomState', ({ room, players }) => {
+    socket.on('roomState', ({ room, players, winners }) => {
       setRoom(room);
       setPlayers(players);
+      if (winners && Array.isArray(winners)) {
+        useGameStore.getState().setWinners(winners);
+      }
     });
 
     socket.on('playerJoined', (player) => {

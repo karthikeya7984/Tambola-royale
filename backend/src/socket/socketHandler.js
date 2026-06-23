@@ -40,9 +40,20 @@ function initSocket(socketIO) {
         });
 
         const tickets = await Ticket.find({ roomId: room._id }).populate('userId', 'name avatar');
+        const winners = await Winner.find({ roomId: room._id }).populate('userId', 'name avatar');
         socket.emit('roomState', {
           room,
           players: tickets.map(t => ({ userId: t.userId._id, name: t.userId.name, avatar: t.userId.avatar })),
+          winners: winners.map(w => ({
+            _id: w._id,
+            userId: w.userId,
+            userName: (w.userId as any)?.name || 'Unknown',
+            avatar: (w.userId as any)?.avatar || '',
+            prizeName: w.prizeName,
+            prizeId: w.prizeId,
+            claimTime: w.claimTime,
+            status: w.status,
+          })),
         });
       } catch (err) {
         socket.emit('error', { message: err.message });
@@ -73,6 +84,7 @@ function initSocket(socketIO) {
           return socket.emit('error', { message: 'All numbers drawn' });
         }
 
+        room.drawnNumbers = Array.isArray(room.drawnNumbers) ? room.drawnNumbers : [];
         let number;
         do { number = Math.floor(Math.random() * 90) + 1; } while (room.drawnNumbers.includes(number));
 

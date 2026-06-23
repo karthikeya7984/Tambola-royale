@@ -16,7 +16,7 @@ const roomSchema = new mongoose.Schema({
   isPublic: { type: Boolean, default: true },
   status: { type: String, enum: ['waiting', 'playing', 'paused', 'ended'], default: 'waiting' },
   prizes: [prizeSchema],
-  drawnNumbers: [{ type: Number }],
+  drawnNumbers: { type: [Number], default: [] },
   currentNumber: { type: Number, default: null },
   players: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 }, { timestamps: true });

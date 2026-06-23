@@ -27,8 +27,27 @@ export default function CreateGame() {
   const [created, setCreated] = useState<{ roomCode: string } | null>(null);
   const [copied, setCopied] = useState(false);
 
-  function updatePrize(i: number, field: string, value: any) {
+  type PrizeField = 'name' | 'winnerLimit' | 'multipleWinners';
+
+  function updatePrize(i: number, field: PrizeField, value: any) {
     setPrizes(prev => prev.map((p, idx) => idx === i ? { ...p, [field]: value } : p));
+  }
+
+  function setPrizeWinnerLimit(i: number, value: string) {
+    const parsed = Number(value);
+    const winnerLimit = Number.isFinite(parsed) ? Math.max(1, Math.min(10, parsed)) : 1;
+    updatePrize(i, 'winnerLimit', winnerLimit);
+  }
+
+  function toggleMultipleWinners(i: number, checked: boolean) {
+    setPrizes(prev => prev.map((p, idx) => {
+      if (idx !== i) return p;
+      return {
+        ...p,
+        multipleWinners: checked,
+        winnerLimit: checked ? Math.max(2, p.winnerLimit) : 1,
+      };
+    }));
   }
 
   function addPrize() {
@@ -41,11 +60,26 @@ export default function CreateGame() {
 
   async function handleCreate() {
     if (!name.trim()) return toast.error('Enter a game name');
+    if (prizes.some(p => !p.name.trim())) return toast.error('Prize names cannot be empty');
+
+    const sanitizedPrizes = prizes.map(p => {
+      const multipleWinners = Boolean(p.multipleWinners);
+      let winnerLimit = Number(p.winnerLimit) || 1;
+      if (!multipleWinners) winnerLimit = 1;
+      if (multipleWinners && winnerLimit < 2) winnerLimit = 2;
+      return {
+        ...p,
+        name: p.name.trim(),
+        multipleWinners,
+        winnerLimit,
+      };
+    });
+
     setLoading(true);
     try {
       const data = await apiRequest<any>('/rooms/create', {
         method: 'POST', token: token!,
-        body: JSON.stringify({ name, maxPlayers, isPublic, prizes }),
+        body: JSON.stringify({ name, maxPlayers, isPublic, prizes: sanitizedPrizes }),
       });
       setRoom(data.room);
       setTicket(data.ticket);
@@ -151,20 +185,31 @@ export default function CreateGame() {
                     <div className="flex gap-3 items-center">
                       <label className="text-sm text-white/60 whitespace-nowrap">Winners:</label>
                       <input
-                        type="number" min={1} max={10}
+                        type="number"
+                        min={1}
+                        max={10}
+                        step={1}
                         className="input w-20"
                         value={prize.winnerLimit}
-                        onChange={e => updatePrize(i, 'winnerLimit', +e.target.value)}
+                        onChange={e => setPrizeWinnerLimit(i, e.target.value)}
+                        disabled={!prize.multipleWinners}
                       />
                       <label className="flex items-center gap-2 text-sm text-white/60 cursor-pointer">
                         <input
-                          type="checkbox" checked={prize.multipleWinners}
-                          onChange={e => updatePrize(i, 'multipleWinners', e.target.checked)}
+                          type="checkbox"
+                          checked={prize.multipleWinners}
+                          onChange={e => toggleMultipleWinners(i, e.target.checked)}
                           className="rounded"
                         />
                         Multiple Winners
                       </label>
                     </div>
+                    {!prize.multipleWinners && (
+                      <p className="text-xs text-white/40">Single winner prize: winner limit fixed to 1.</p>
+                    )}
+                    {prize.multipleWinners && (
+                      <p className="text-xs text-white/40">Enter how many winners can claim this prize.</p>
+                    )}
                   </div>
                 ))}
               </div>

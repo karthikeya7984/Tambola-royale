@@ -25,6 +25,8 @@ export default function NumberJar({ onDraw, currentNumber, drawnCount, disabled 
   const [displayNum, setDisplayNum] = useState<number | null>(null);
   const animRef = useRef<number>(0);
   const ballsRef = useRef<BallInJar[]>([]);
+  const normalizedDrawnCount = Number.isFinite(drawnCount) ? drawnCount : 0;
+  const remainingNumbers = Math.max(0, 90 - normalizedDrawnCount);
 
   useEffect(() => {
     const initial: BallInJar[] = Array.from({ length: 12 }, (_elem, i) => ({
@@ -92,7 +94,7 @@ export default function NumberJar({ onDraw, currentNumber, drawnCount, disabled 
 
           {/* Label */}
           <div className="absolute bottom-4 left-0 right-0 text-center">
-            <span className="text-xs text-white/40">{90 - drawnCount} remaining</span>
+            <span className="text-xs text-white/40">{remainingNumbers} remaining</span>
           </div>
         </div>
 
