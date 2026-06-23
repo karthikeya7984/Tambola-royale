@@ -19,14 +19,14 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || '*',
+    origin: '*',
     methods: ['GET', 'POST'],
     credentials: true,
   },
 });
 
 app.use(cors({
-  origin: process.env.CLIENT_URL || '*',
+  origin:  '*',
   credentials: true,
 }));
 app.use(express.json());
@@ -46,10 +46,9 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('MongoDB connected');
     const PORT = process.env.PORT || 5000;
-    const HOST = process.env.HOST || '0.0.0.0';
-    server.listen(PORT, HOST, () => {
-      console.log(`Server running on http://${HOST}:${PORT}`);
-      console.log(`LAN access: http://YOUR_LOCAL_IP:${PORT}`);
+    server.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(`LAN access: http://localhost:${PORT}`);
     });
   })
   .catch(err => console.error('MongoDB error:', err));
